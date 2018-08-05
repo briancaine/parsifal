@@ -34,7 +34,7 @@ let server_socket ?bind_address:(bind_addr=None) ?backlog:(backlog=1024) port =
   in
   let local_addr = Unix.ADDR_INET (inet_addr, port) in
   Lwt_unix.setsockopt s Unix.SO_REUSEADDR true;
-  Lwt_unix.bind s local_addr;
+  Unix.bind (Lwt_unix.unix_file_descr s) local_addr;
   Lwt_unix.listen s backlog;
   s
 
@@ -45,7 +45,7 @@ let launch_server ?bind_address:(bind_addr=None) ?backlog:(backlog=1024) port (s
     service s >>= fun () ->
     do_accept ()
   in
-  Lwt_unix.run (do_accept ())
+  Lwt_main.run (do_accept ())
 
 
 
